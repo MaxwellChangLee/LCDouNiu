@@ -10,11 +10,12 @@
 #import "Masonry.h"
 #import "DNMacro.h"
 
-#define kCardWidth 43 //自己手牌宽度
+#define kCardWidth 43.0 //自己手牌宽度
 #define kSelfNormalCardHeight 50.5 //自己手牌第一层的牌高度
-#define kSelfFoldCardHeight 36 //自己手牌第二层第三层的牌高度
+#define kSelfFoldCardHeight 36.0 //自己手牌第二层第三层的牌高度
 
 #define kGiveCardAnimationTime 0.3 //发牌动画时间
+#define kMoveCardAnimationTime 0.3 //牌重新布局的动画时间
 
 @interface ViewController ()
 
@@ -84,7 +85,6 @@
     [self determineOverlap];
     [self createCardViews];
     [self dealCardViews];
-    
 }
 
 - (void) createCardViews {
@@ -130,11 +130,44 @@
             break;
         case UIGestureRecognizerStateEnded:
         {
-           
+            [self dealWithCardView:panPlayingCardView
+                   withCenterPoint:rightPoint];
         }
             break;
         default:
             break;
+    }
+}
+
+//pan手势结束之后，判断当前牌的位置，决定是
+//1.回原来位置
+//2.停留在当前section顶部
+//3.打出去
+-(void)dealWithCardView:(DNPlayingCardView *)cardView withCenterPoint:(CGPoint)centerPoint
+{
+    NSInteger sectionCount = [self getMaxSection] + 1;
+    CGFloat leftSpace = [self getLeftSpaceWithSectionCount:sectionCount];
+    CGFloat gap = centerPoint.x - leftSpace;
+    //位置太靠左，直接返回原来位置
+    if (gap < - kCardWidth / 2.0) {
+        [self moveBackToOriginFrameWithView:cardView];
+    }else if(gap > sectionCount * kCardWidth + kCardWidth / 2.0){
+        [self playOutWithView:cardView];
+    }else{
+        NSInteger currentPoSection = fabs(gap / kCardWidth);
+        NSLog(@"currentPoSection = %ld", (long)currentPoSection);
+        NSInteger maxRow = [self getMaxRowOfSection:currentPoSection];
+        //当前section已经叠加了3张牌，移动回原来位置
+        if (maxRow >= 2) {
+            [self moveBackToOriginFrameWithView:cardView];
+        }else{ //否则叠在对应section的最上面
+            if(currentPoSection > sectionCount){
+                currentPoSection = sectionCount;
+            }
+            cardView.section = (int)currentPoSection;
+            cardView.row = (int)maxRow + 1;
+            [self reLayoutAllCardView];
+        }
     }
 }
 
@@ -161,6 +194,8 @@
 - (void) determineOverlap {
     self.standardOverlap = 40;
 }
+
+#pragma mark - 起始发牌动画
 
 - (void) dealCardViews {
     CGFloat posX = self.player1HandContainer.frame.origin.x;
@@ -229,7 +264,6 @@
         }];
         count++;
     }
-    
 }
 
 - (void)backButton:(UIButton *)sender {
@@ -275,8 +309,6 @@
     [self.selectedCardViews removeAllObjects];
 }
 
-
-
 - (void)condensePlayedCards {
     // Condense previously played card views
     for (DNPlayingCardView *playingCardView in self.playedCardViews) {
@@ -287,6 +319,19 @@
     [self.playedCardViews removeAllObjects];
 }
 
+//获取某一个section内的最大的row
+-(NSInteger)getMaxRowOfSection:(NSInteger)section
+{
+    NSInteger maxRow = 0;
+    for (DNPlayingCardView *playingCardView in self.playedCardViews) {
+        if (playingCardView.section == section) {
+            maxRow = maxRow > playingCardView.row ? maxRow : playingCardView.row;
+        }
+    }
+    return maxRow;
+}
+
+//查看当前最大的section，以便找出当前有多少个section
 -(NSInteger)getMaxSection
 {
     NSInteger maxSection = 0;
@@ -294,6 +339,40 @@
         maxSection = maxSection > playingCardView.section ? maxSection : playingCardView.section;
     }
     return maxSection;
+}
+
+//根据当前的section个数，判断左侧的距离
+-(CGFloat)getLeftSpaceWithSectionCount:(NSInteger)sectionCount
+{
+    return (DN_SCREEN_WIDTH - kCardWidth * sectionCount) / 2.0;
+}
+
+#pragma mark - 移动卡牌之后，重新布局
+
+-(void)reLayoutAllCardView
+{
+    NSInteger sectionCount = [self getMaxSection] + 1;
+    CGFloat leftSpace = [self getLeftSpaceWithSectionCount:sectionCount];
+    CGFloat standY = self.player1HandContainer.frame.origin.y + self.player1HandContainer.frame.size.height;
+    for (DNPlayingCardView *playingCardView in self.playedCardViews) {
+        CGFloat posX = leftSpace + playingCardView.section * kCardWidth;
+        CGFloat posY = 0;
+        if (playingCardView.row == 0) {
+            posY = standY - kSelfNormalCardHeight;
+        }else{
+            posY = standY - kSelfNormalCardHeight - playingCardView.row * kSelfFoldCardHeight;
+            [self.view sendSubviewToBack:playingCardView];
+        }
+        [UIView animateWithDuration:kMoveCardAnimationTime
+                         animations:^{
+                             [playingCardView setFrame:CGRectMake(posX,
+                                                                  posY,
+                                                                  kCardWidth,
+                                                                  kSelfNormalCardHeight)];
+            
+        }];
+    }
+    [self.view sendSubviewToBack:self.player1HandContainer];
 }
 
 #pragma mark - 拖动卡牌之后的操作
@@ -305,12 +384,6 @@
                      animations:^{
                          [cardView setFrame:_originFrame];
                      }];
-}
-
-//停在附近的牌之上，包括下面没有牌的情况
--(void)stayUpTheSectionTop
-{
-    
 }
 
 //把牌打出去
