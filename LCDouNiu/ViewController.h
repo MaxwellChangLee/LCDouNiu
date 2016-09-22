@@ -7,8 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DNGame.h"
+#import "DNPlayingCardView.h"
+
 
 @interface ViewController : UIViewController
+
+@property (strong, nonatomic) DNGame *game;
+@property (strong, nonatomic) NSString *player1Name;
 
 
 @end
