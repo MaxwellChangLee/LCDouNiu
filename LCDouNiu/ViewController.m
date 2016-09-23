@@ -115,6 +115,12 @@
 -(void)cardPanGesture:(UIPanGestureRecognizer *)panGesture
 {
     DNPlayingCardView *panPlayingCardView = (DNPlayingCardView *)panGesture.view;
+    /*
+    NSInteger maxRow = [self getMaxRowOfSection:panPlayingCardView.section];
+    if (maxRow > panPlayingCardView.row) {
+        return;
+    }
+     */
     CGPoint rightPoint = [panGesture locationInView:self.view];
     switch (panGesture.state) {
         case UIGestureRecognizerStateBegan:
@@ -151,10 +157,14 @@
     //位置太靠左，直接返回原来位置
     if (gap < - kCardWidth / 2.0) {
         [self moveBackToOriginFrameWithView:cardView];
-    }else if(gap > sectionCount * kCardWidth + kCardWidth / 2.0){
+    }else if(gap > self.player1HandContainer.frame.size.width + kCardWidth / 2.0){
         [self playOutWithView:cardView];
     }else{
         NSInteger currentPoSection = fabs(gap / kCardWidth);
+        if (currentPoSection == cardView.section) {
+            [self moveBackToOriginFrameWithView:cardView];
+            return;
+        }
         NSLog(@"currentPoSection = %ld", (long)currentPoSection);
         NSInteger maxRow = [self getMaxRowOfSection:currentPoSection];
         //当前section已经叠加了3张牌，移动回原来位置
@@ -164,8 +174,23 @@
             if(currentPoSection > sectionCount){
                 currentPoSection = sectionCount;
             }
+            //移走牌后，那个section没有牌了
+            BOOL needAdjustSection = NO;
+            CGFloat originSection = cardView.section;
+            if (cardView.row == 0 && [self getMaxRowOfSection:cardView.section] == 0)
+            {
+                needAdjustSection = YES;
+            }
             cardView.section = (int)currentPoSection;
             cardView.row = (int)maxRow + 1;
+            [self.view sendSubviewToBack:cardView];
+            if(needAdjustSection){
+                for (DNPlayingCardView *card in self.playingCardViews) {
+                    if (card.section > originSection) {
+                        card.section --;
+                    }
+                }
+            }
             [self reLayoutAllCardView];
         }
     }
@@ -322,8 +347,8 @@
 //获取某一个section内的最大的row
 -(NSInteger)getMaxRowOfSection:(NSInteger)section
 {
-    NSInteger maxRow = 0;
-    for (DNPlayingCardView *playingCardView in self.playedCardViews) {
+    NSInteger maxRow = -1;
+    for (DNPlayingCardView *playingCardView in self.playingCardViews) {
         if (playingCardView.section == section) {
             maxRow = maxRow > playingCardView.row ? maxRow : playingCardView.row;
         }
@@ -335,7 +360,7 @@
 -(NSInteger)getMaxSection
 {
     NSInteger maxSection = 0;
-    for (DNPlayingCardView *playingCardView in self.playedCardViews) {
+    for (DNPlayingCardView *playingCardView in self.playingCardViews) {
         maxSection = maxSection > playingCardView.section ? maxSection : playingCardView.section;
     }
     return maxSection;
@@ -354,14 +379,13 @@
     NSInteger sectionCount = [self getMaxSection] + 1;
     CGFloat leftSpace = [self getLeftSpaceWithSectionCount:sectionCount];
     CGFloat standY = self.player1HandContainer.frame.origin.y + self.player1HandContainer.frame.size.height;
-    for (DNPlayingCardView *playingCardView in self.playedCardViews) {
+    for (DNPlayingCardView *playingCardView in self.playingCardViews) {
         CGFloat posX = leftSpace + playingCardView.section * kCardWidth;
         CGFloat posY = 0;
         if (playingCardView.row == 0) {
             posY = standY - kSelfNormalCardHeight;
         }else{
             posY = standY - kSelfNormalCardHeight - playingCardView.row * kSelfFoldCardHeight;
-            [self.view sendSubviewToBack:playingCardView];
         }
         [UIView animateWithDuration:kMoveCardAnimationTime
                          animations:^{

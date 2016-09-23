@@ -7,6 +7,7 @@
 //
 
 #import "DNPlayingCardView.h"
+#import "Masonry.h"
 
 @interface DNPlayingCardView()
 
@@ -32,6 +33,14 @@
         self.opaque = NO;
         self.contentMode = UIViewContentModeRedraw;
         
+        /*
+        [self addSubview:self.cardKindImageView];
+        [self.cardKindImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.mas_top).with.offset(5);
+            make.width.equalTo(self.mas_width);
+            make.height.equalTo(self.mas_width).multipliedBy(56 / 67.0);
+        }];
+         */
     }
     return self;
 }
@@ -49,7 +58,11 @@
     [roundedRect stroke];
     
     if (self.faceUp) {
-        [self drawRankAndSuit];
+        //[self drawRankAndSuit];
+        [[UIImage imageNamed:@"card_large_10"] drawInRect:CGRectMake(0,
+                                                                     5,
+                                                                     self.bounds.size.width,
+                                                                     self.bounds.size.width * 56 / 67.0)];
     } else {
         [[UIImage imageNamed:@"cardback"] drawInRect:self.bounds];
     }
@@ -108,4 +121,12 @@
     [self setNeedsDisplay];
 }
 
+-(UIImageView *)cardKindImageView
+{
+    if (!_cardKindImageView) {
+        _cardKindImageView = [[UIImageView alloc] init];
+        _cardKindImageView.image = [UIImage imageNamed:@"card_large_10"];
+    }
+    return _cardKindImageView;
+}
 @end

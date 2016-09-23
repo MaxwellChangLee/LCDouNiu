@@ -19,6 +19,5 @@
 @property (nonatomic, assign) int section;
 //牌叠起来的时候，row从下往上，从0 到 2 最多3行。
 @property (nonatomic, assign) int row;
-@property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
 
 @end
