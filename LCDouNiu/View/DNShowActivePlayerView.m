@@ -19,6 +19,7 @@
     self.topScoreLabel.textColor = RGBColorC(0xfa381c);
     self.rightScoreLabel.textColor = RGBColorC(0xf5881e);
     self.bottomScoreLabel.textColor = RGBColorC(0xf5881e);
+    
 }
 /*
 // Only override drawRect: if you perform custom drawing.

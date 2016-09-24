@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04F42E671D96E2A8005A483D /* show_arrow_down@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04F42E641D96E2A8005A483D /* show_arrow_down@2x.png */; };
+		04F42E681D96E2A8005A483D /* show_arrow_left@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04F42E651D96E2A8005A483D /* show_arrow_left@2x.png */; };
+		04F42E691D96E2A8005A483D /* show_arrow_up@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04F42E661D96E2A8005A483D /* show_arrow_up@2x.png */; };
 		502A27381D912E3400473F23 /* DNDeck.m in Sources */ = {isa = PBXBuildFile; fileRef = 502A27371D912E3400473F23 /* DNDeck.m */; };
 		502A273B1D912F7500473F23 /* DNPlayingCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 502A273A1D912F7500473F23 /* DNPlayingCardView.m */; };
 		502A273E1D91302F00473F23 /* DNGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 502A273D1D91302F00473F23 /* DNGame.m */; };
@@ -132,6 +135,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		04F42E641D96E2A8005A483D /* show_arrow_down@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "show_arrow_down@2x.png"; sourceTree = "<group>"; };
+		04F42E651D96E2A8005A483D /* show_arrow_left@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "show_arrow_left@2x.png"; sourceTree = "<group>"; };
+		04F42E661D96E2A8005A483D /* show_arrow_up@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "show_arrow_up@2x.png"; sourceTree = "<group>"; };
 		502A27361D912E3400473F23 /* DNDeck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DNDeck.h; sourceTree = "<group>"; };
 		502A27371D912E3400473F23 /* DNDeck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DNDeck.m; sourceTree = "<group>"; };
 		502A27391D912F7500473F23 /* DNPlayingCardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DNPlayingCardView.h; sourceTree = "<group>"; };
@@ -376,6 +382,9 @@
 			children = (
 				5045EBD61D964E52006FF2AD /* bg_face_circle@2x.png */,
 				5045EC051D9678C5006FF2AD /* card_backGround@2x.png */,
+				04F42E641D96E2A8005A483D /* show_arrow_down@2x.png */,
+				04F42E651D96E2A8005A483D /* show_arrow_left@2x.png */,
+				04F42E661D96E2A8005A483D /* show_arrow_up@2x.png */,
 				5045EC071D967C9B006FF2AD /* bg_zipai_noshadow@2x.png */,
 				5045EBA21D961D71006FF2AD /* banker@2x.png */,
 				5045EBD41D964AED006FF2AD /* test_header@2x.png */,
@@ -704,6 +713,7 @@
 				5045EBFB1D967762006FF2AD /* card_little_1@2x.png in Resources */,
 				5045EB7E1D961AEA006FF2AD /* hu_1@2x.png in Resources */,
 				5045EC021D967762006FF2AD /* card_little_8@2x.png in Resources */,
+				04F42E691D96E2A8005A483D /* show_arrow_up@2x.png in Resources */,
 				5045EC011D967762006FF2AD /* card_little_7@2x.png in Resources */,
 				5045EBB61D961D71006FF2AD /* card_box@2x.png in Resources */,
 				5045EBD71D964E52006FF2AD /* bg_face_circle@2x.png in Resources */,
@@ -721,6 +731,7 @@
 				5098FC201D9260A7007AF211 /* LICENSE in Resources */,
 				5045EB851D961AEA006FF2AD /* hu_7@2x.png in Resources */,
 				5045EBF71D967762006FF2AD /* card_large_7@2x.png in Resources */,
+				04F42E681D96E2A8005A483D /* show_arrow_left@2x.png in Resources */,
 				5045EBF91D967762006FF2AD /* card_large_9@2x.png in Resources */,
 				5045EBFF1D967762006FF2AD /* card_little_5@2x.png in Resources */,
 				5045EB861D961AEA006FF2AD /* hu_8@2x.png in Resources */,
@@ -729,6 +740,7 @@
 				5045EB831D961AEA006FF2AD /* hu_5@2x.png in Resources */,
 				5045EB741D961AEA006FF2AD /* hu_10@2x.png in Resources */,
 				5045EBBA1D961D71006FF2AD /* game_bg@2x.png in Resources */,
+				04F42E671D96E2A8005A483D /* show_arrow_down@2x.png in Resources */,
 				5045EBFA1D967762006FF2AD /* card_large_10@2x.png in Resources */,
 				5045EB821D961AEA006FF2AD /* hu_4@2x.png in Resources */,
 				5045EBB81D961D71006FF2AD /* card_yellow_bg@2x.png in Resources */,

@@ -24,22 +24,22 @@
                         <constraint firstAttribute="height" constant="20" id="q3w-Cm-flb"/>
                     </constraints>
                 </imageView>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="show_arrow.png" translatesAutoresizingMaskIntoConstraints="NO" id="sAQ-iL-pEU">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="show_arrow_down.png" translatesAutoresizingMaskIntoConstraints="NO" id="sAQ-iL-pEU">
                     <constraints>
-                        <constraint firstAttribute="width" constant="15.5" id="JBP-wo-UTv"/>
-                        <constraint firstAttribute="height" constant="20" id="ag7-r6-sWU"/>
+                        <constraint firstAttribute="width" constant="20" id="JBP-wo-UTv"/>
+                        <constraint firstAttribute="height" constant="15.5" id="ag7-r6-sWU"/>
                     </constraints>
                 </imageView>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="show_arrow.png" translatesAutoresizingMaskIntoConstraints="NO" id="MmN-h1-0Fy">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="show_arrow_left.png" translatesAutoresizingMaskIntoConstraints="NO" id="MmN-h1-0Fy">
                     <constraints>
                         <constraint firstAttribute="height" constant="20" id="GcL-Aj-Ojr"/>
                         <constraint firstAttribute="width" constant="15.5" id="g5Q-UD-1eK"/>
                     </constraints>
                 </imageView>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="show_arrow.png" translatesAutoresizingMaskIntoConstraints="NO" id="BoW-OC-r6O">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="show_arrow_up.png" translatesAutoresizingMaskIntoConstraints="NO" id="BoW-OC-r6O">
                     <constraints>
-                        <constraint firstAttribute="height" constant="20" id="UQZ-vt-8cf"/>
-                        <constraint firstAttribute="width" constant="15.5" id="cpa-Rz-ozc"/>
+                        <constraint firstAttribute="height" constant="15.5" id="UQZ-vt-8cf"/>
+                        <constraint firstAttribute="width" constant="20" id="cpa-Rz-ozc"/>
                     </constraints>
                 </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+6胡" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OQG-Qs-O8a">
@@ -103,5 +103,8 @@
     <resources>
         <image name="card_box.png" width="37" height="37"/>
         <image name="show_arrow.png" width="15" height="20"/>
+        <image name="show_arrow_down.png" width="20" height="15"/>
+        <image name="show_arrow_left.png" width="15" height="20"/>
+        <image name="show_arrow_up.png" width="20" height="15"/>
     </resources>
 </document>

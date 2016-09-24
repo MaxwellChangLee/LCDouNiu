@@ -43,6 +43,11 @@
 @property (nonatomic, strong) UILabel *rightOwnLabel;
 @property (nonatomic, strong) UILabel *topOwnLabel;
 
+@property (nonatomic, strong) UIImageView *bottomAnimationView;
+@property (nonatomic, strong) UIImageView *leftAnimationView;
+@property (nonatomic, strong) UIImageView *rightAnimationView;
+@property (nonatomic, strong) UIImageView *topAnimationView;
+
 @property (nonatomic, strong) UILabel *roomInfoLabel;
 //手中的牌
 @property (strong, nonatomic) NSMutableArray *playingCardViews;
@@ -50,8 +55,6 @@
 @property (strong, nonatomic) NSMutableArray *selectedCardViews;
 //打出去的牌
 @property (strong, nonatomic) NSMutableArray *playedCardViews;
-
-@property (nonatomic) CGFloat standardOverlap;
 
 @property (nonatomic, strong) NSMutableArray *huAnimationImageArr;
 
@@ -86,6 +89,11 @@
     [self.view addSubview:self.leftOwnLabel];
     [self.view addSubview:self.rightOwnLabel];
     [self.view addSubview:self.topOwnLabel];
+    
+    [self.view addSubview:self.bottomAnimationView];
+    [self.view addSubview:self.leftAnimationView];
+    [self.view addSubview:self.rightAnimationView];
+    [self.view addSubview:self.topAnimationView];
     
     [self.view addSubview:self.middleBoxView];
     [self.view addSubview:self.menuView];
@@ -187,6 +195,13 @@
         make.right.equalTo(self.topHeadView.mas_left).with.offset(-3);
     }];
     
+    [self.leftAnimationView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.leftNameView.mas_right);
+        make.centerY.equalTo(self.leftNameView.mas_centerY);
+        make.width.equalTo(@150);
+        make.height.equalTo(@125);
+    }];
+    
     CGFloat gap = (DN_SCREEN_WIDTH - 10 * kCardWidth) / 2.0;
     
     [self.player1HandContainer mas_updateConstraints:^(MASConstraintMaker *make) {
@@ -219,7 +234,6 @@
 
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self determineOverlap];
     [self createCardViews];
     [self dealCardViews];
 }
@@ -266,26 +280,11 @@
     }
 }
 
-- (void) sortCards:(NSMutableArray *)cards {
-    
-}
-
-
--(void)cardTappedGesture:(UITapGestureRecognizer *)tapGestureRecognizer {
-    DNPlayingCardView *tappedPlayingCardView = (DNPlayingCardView *)tapGestureRecognizer.view;
-    NSLog(@"The tapped card is %@", tappedPlayingCardView.playingCard.contents);
-    [self selectPlayingCard:tappedPlayingCardView];
-}
+#pragma mark - 移动卡牌逻辑
 
 -(void)cardPanGesture:(UIPanGestureRecognizer *)panGesture
 {
     DNPlayingCardView *panPlayingCardView = (DNPlayingCardView *)panGesture.view;
-    /*
-    NSInteger maxRow = [self getMaxRowOfSection:panPlayingCardView.section];
-    if (maxRow > panPlayingCardView.row) {
-        return;
-    }
-     */
     CGPoint rightPoint = [panGesture locationInView:self.view];
     switch (panGesture.state) {
         case UIGestureRecognizerStateBegan:
@@ -320,10 +319,54 @@
     CGFloat leftSpace = [self getLeftSpaceWithSectionCount:sectionCount];
     CGFloat gap = centerPoint.x - leftSpace;
     //位置太靠左，直接返回原来位置
-    if (gap < - kCardWidth / 2.0) {
+    if (gap < - kCardWidth / 2.0 - kCardWidth) {
         [self moveBackToOriginFrameWithView:cardView];
+    }else if (gap < - kCardWidth / 2.0){ //移动到牌左边的情况
+        if (sectionCount >= 10) {
+            [self moveBackToOriginFrameWithView:cardView];
+            return;
+        }
+        NSInteger moveSectionMaxRow = [self getMaxRowOfSection:cardView.section];
+
+        //移走牌后，那个section没有牌了
+        BOOL needAdjustSection = NO;
+        //移走的不是最顶上的牌
+        BOOL needAdjustRow = NO;
+        NSInteger originSection = cardView.section;
+        NSInteger originRow = cardView.row;
+        if (cardView.row == 0 && moveSectionMaxRow == 0)
+        {
+            needAdjustSection = YES;
+        }else if (cardView.row < moveSectionMaxRow){ //说明移动的不是最顶上的牌
+            needAdjustRow = YES;
+        }
+        [self.bgImageView sendSubviewToBack:cardView];
+        if(needAdjustSection){
+            for (DNPlayingCardView *card in self.playingCardViews) {
+                if (card.section > originSection) {
+                    card.section --;
+                }
+            }
+        }
+        if (needAdjustRow) {
+            for (DNPlayingCardView *card in self.playingCardViews) {
+                if (card.section == originSection) {
+                    if (card.row > originRow) {
+                        card.row --;
+                    }
+                }
+            }
+        }
+        cardView.section = 0;
+        cardView.row = 0;
+        for (DNPlayingCardView *card in self.playingCardViews) {
+            if (card != cardView) {
+                card.section ++;
+            }
+        }
+        [self reLayoutAllCardView];
     }else if(gap > self.player1HandContainer.frame.size.width + kCardWidth / 2.0){
-        [self playOutWithView:cardView];
+        [self playOutWithView:cardView]; //将牌打出
     }else{
         NSInteger currentPoSection = fabs(gap / kCardWidth);
         if (currentPoSection == cardView.section || currentPoSection >= 10) {
@@ -342,6 +385,7 @@
             }
             //移走牌后，那个section没有牌了
             BOOL needAdjustSection = NO;
+            //移走的不是最顶上的牌
             BOOL needAdjustRow = NO;
             NSInteger originSection = cardView.section;
             NSInteger originRow = cardView.row;
@@ -375,28 +419,14 @@
     }
 }
 
-- (void)selectPlayingCard:(DNPlayingCardView *)playingCardView {
-    CGRect frame = playingCardView.frame;
-    
-    if (playingCardView.playingCard.isSelected) { // already selected
-        playingCardView.playingCard.selected = NO;
-        [self.game.player1 removeCardFromCombination:playingCardView.playingCard];
-        [self.selectedCardViews removeObject:playingCardView];
-        [UIView animateWithDuration:0.3 animations:^{
-            playingCardView.frame = CGRectMake(frame.origin.x, frame.origin.y + 40, frame.size.width, frame.size.height);
-        }];
-    } else { // now it is selected
-        playingCardView.playingCard.selected = YES;
-        [self.game.player1 addCardToCombination:playingCardView.playingCard];
-        [self.selectedCardViews addObject:playingCardView];
-        [UIView animateWithDuration:0.3 animations:^{
-            playingCardView.frame = CGRectMake(frame.origin.x, frame.origin.y - 40, frame.size.width, frame.size.height);
-        }];
-    }
-}
+#pragma mark - event
 
-- (void) determineOverlap {
-    self.standardOverlap = 40;
+-(void)huButtonClick:(UIButton *)button
+{
+    self.leftAnimationView.animationImages = self.huAnimationImageArr;
+    self.leftAnimationView.animationRepeatCount = 1;
+    self.leftAnimationView.animationDuration = 1;
+    [self.leftAnimationView startAnimating];
 }
 
 #pragma mark - 起始发牌动画
@@ -448,79 +478,6 @@
         }];
         count++;
     }
-}
-
-- (void)adjustCardsInHand {
-    
-    CGFloat containerWidth = self.player1HandContainer.frame.size.width;
-
-    CGFloat gap = (containerWidth - [self.playingCardViews count] * kCardWidth) / 2.0;
-    CGFloat startingX = 50 + gap;
-    
-    int count = 0;
-    for (DNPlayingCardView *playingCardView in self.playingCardViews) {
-        CGRect cardFrame = CGRectMake(startingX + (count * kCardWidth),
-                                      playingCardView.frame.origin.y,
-                                      playingCardView.frame.size.width,
-                                      playingCardView.frame.size.height);
-        [UIView animateWithDuration:0.3 animations:^{
-            playingCardView.frame = cardFrame;
-        }];
-        count++;
-    }
-}
-
-- (void)backButton:(UIButton *)sender {
-    [self dismissViewControllerAnimated:self completion:nil];
-}
-
-
-- (void)playButtonPressed:(UIButton *)sender {
-    // Ask the player to play the combination
-    // Maybe this should return a BOOL to determine whether these animations should occur
-    [self.game.player1 playCombination];
-    
-    [self condensePlayedCards];
-    
-    [self layDownSelectedCardsOntoTableau];
-    
-    [self adjustCardsInHand];
-}
-
-- (void)layDownSelectedCardsOntoTableau {
-    // Determine positions of frames for selected cards
-    CGRect tableauFrame = CGRectZero;//self.tableauView.frame;
-    CGFloat totalWidthOfSelection = tableauFrame.size.width + (self.standardOverlap * ([self.selectedCardViews count] - 1));
-    CGFloat startingXPos = tableauFrame.origin.x + (tableauFrame.size.width / 2) - (totalWidthOfSelection / 2);
-    
-    int count = 0;
-    for (DNPlayingCardView *playingCardView in self.selectedCardViews) {
-        // Remove from the playingCardViews array and add to the playedCardViews array
-        [self.playingCardViews removeObject:playingCardView];
-        [self.playedCardViews addObject:playingCardView];
-        
-        CGRect frame = CGRectMake(startingXPos + self.standardOverlap * count,
-                                  tableauFrame.origin.y,
-                                  playingCardView.frame.size.width,
-                                  playingCardView.frame.size.height);
-        
-        [UIView animateWithDuration:0.9 animations:^{
-            [self.view bringSubviewToFront:playingCardView];
-            playingCardView.frame = frame;
-        }];
-        count++;
-    }
-    [self.selectedCardViews removeAllObjects];
-}
-
-- (void)condensePlayedCards {
-    // Condense previously played card views
-    for (DNPlayingCardView *playingCardView in self.playedCardViews) {
-        [UIView animateWithDuration:0.3 animations:^{
-//            playingCardView.frame = self.tableauView.frame;
-        }];
-    }
-    [self.playedCardViews removeAllObjects];
 }
 
 //获取某一个section内的最大的row
@@ -628,6 +585,9 @@
 {
     if (!_menuView) {
         _menuView = [[[NSBundle mainBundle] loadNibNamed:@"DNMenuView" owner:self options:nil] firstObject];
+        [_menuView.huButton addTarget:self
+                               action:@selector(huButtonClick:)
+                     forControlEvents:UIControlEventTouchUpInside];
         _menuView.backgroundColor = [UIColor clearColor];
     }
     return _menuView;
@@ -760,5 +720,37 @@
         _roomInfoLabel.text = @"房间号：5423\n中庄 X 2\n强制胡牌\n局：2/5";
     }
     return _roomInfoLabel;
+}
+
+-(UIImageView *)bottomAnimationView
+{
+    if (!_bottomAnimationView) {
+        _bottomAnimationView = [[UIImageView alloc] init];
+    }
+    return _bottomAnimationView;
+}
+
+-(UIImageView *)leftAnimationView
+{
+    if (!_leftAnimationView) {
+        _leftAnimationView = [[UIImageView alloc] init];
+    }
+    return _leftAnimationView;
+}
+
+-(UIImageView *)rightAnimationView
+{
+    if (!_rightAnimationView) {
+        _rightAnimationView = [[UIImageView alloc] init];
+    }
+    return _rightAnimationView;
+}
+
+-(UIImageView *)topAnimationView
+{
+    if (!_topAnimationView) {
+        _topAnimationView = [[UIImageView alloc] init];
+    }
+    return _topAnimationView;
 }
 @end
