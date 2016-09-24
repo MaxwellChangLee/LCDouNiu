@@ -9,8 +9,12 @@
 #import "ViewController.h"
 #import "Masonry.h"
 #import "DNMacro.h"
+#import "DNMenuView.h"
+#import "DNShowActivePlayerView.h"
+#import "DNHeadView.h"
+#import "DNNameView.h"
 
-#define kCardWidth 43.0 //自己手牌宽度
+#define kCardWidth 43 //自己手牌宽度
 #define kSelfNormalCardHeight 50.5 //自己手牌第一层的牌高度
 #define kSelfFoldCardHeight 36.0 //自己手牌第二层第三层的牌高度
 
@@ -19,10 +23,27 @@
 
 @interface ViewController ()
 
-//中间的View
-@property (strong, nonatomic) UIImageView *tableauView;
-//自己手牌的区域
-@property (strong, nonatomic) UIView *player1HandContainer;
+@property (nonatomic, strong) UIImageView *bgImageView;              //背景图片
+@property (nonatomic, strong) DNMenuView *menuView;                  //吃碰胡过
+@property (nonatomic, strong) DNShowActivePlayerView *middleBoxView; //中间的View
+@property (strong, nonatomic) UIView *player1HandContainer;          //自己手牌的区域
+
+@property (nonatomic, strong) DNHeadView *bottomHeadView;
+@property (nonatomic, strong) DNHeadView *leftHeadView;
+@property (nonatomic, strong) DNHeadView *rightHeadView;
+@property (nonatomic, strong) DNHeadView *topHeadView;
+
+@property (nonatomic, strong) DNNameView *bottomNameView;
+@property (nonatomic, strong) DNNameView *leftNameView;
+@property (nonatomic, strong) DNNameView *rightNameView;
+@property (nonatomic, strong) DNNameView *topNameView;
+
+@property (nonatomic, strong) UILabel *bottomOwnLabel;
+@property (nonatomic, strong) UILabel *leftOwnLabel;
+@property (nonatomic, strong) UILabel *rightOwnLabel;
+@property (nonatomic, strong) UILabel *topOwnLabel;
+
+@property (nonatomic, strong) UILabel *roomInfoLabel;
 //手中的牌
 @property (strong, nonatomic) NSMutableArray *playingCardViews;
 //选中的牌
@@ -31,6 +52,8 @@
 @property (strong, nonatomic) NSMutableArray *playedCardViews;
 
 @property (nonatomic) CGFloat standardOverlap;
+
+@property (nonatomic, strong) NSMutableArray *huAnimationImageArr;
 
 //拖动之前的位置
 @property (nonatomic, assign) CGRect originFrame;
@@ -44,8 +67,28 @@
     
     self.player1Name = @"东哥";
     
-    [self.view addSubview:self.tableauView];
     [self.view addSubview:self.player1HandContainer];
+    [self.view addSubview:self.bgImageView];
+    
+    [self.view addSubview:self.roomInfoLabel];
+    
+    [self.view addSubview:self.bottomNameView];
+    [self.view addSubview:self.leftNameView];
+    [self.view addSubview:self.rightNameView];
+    [self.view addSubview:self.topNameView];
+    
+    [self.view addSubview:self.bottomHeadView];
+    [self.view addSubview:self.leftHeadView];
+    [self.view addSubview:self.rightHeadView];
+    [self.view addSubview:self.topHeadView];
+    
+    [self.view addSubview:self.bottomOwnLabel];
+    [self.view addSubview:self.leftOwnLabel];
+    [self.view addSubview:self.rightOwnLabel];
+    [self.view addSubview:self.topOwnLabel];
+    
+    [self.view addSubview:self.middleBoxView];
+    [self.view addSubview:self.menuView];
     [self layoutSubviewsOfSelf];
     
     self.game = [[DNGame alloc] init];
@@ -53,18 +96,98 @@
     self.selectedCardViews = [[NSMutableArray alloc] init];
     self.playedCardViews = [[NSMutableArray alloc] init];
     [self.game.player1 displayHand];
+    
+    [self initHuAnimatonPicArr];
 }
 
 -(void)layoutSubviewsOfSelf
 {
-    CGFloat gap = (DN_SCREEN_WIDTH - 10 * kCardWidth) / 2.0;
-    
-    [self.tableauView mas_updateConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self.view.mas_centerX);
-        make.centerY.equalTo(self.view.mas_centerY);
-        make.width.equalTo(@kCardWidth);
-        make.height.equalTo(@kSelfNormalCardHeight);
+    [self.bgImageView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(self.view);
     }];
+    
+    [self.roomInfoLabel mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.view.mas_left).with.offset(10);
+        make.top.equalTo(self.view.mas_top).with.offset(5);
+    }];
+    
+    [self.bottomHeadView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.view.mas_left).with.offset(28);
+        make.bottom.equalTo(self.view.mas_bottom).with.offset(-40);
+        make.width.equalTo(@60);
+        make.height.equalTo(@60);
+    }];
+    
+    [self.leftHeadView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.view.mas_left).with.offset(28);
+        make.top.equalTo(self.view.mas_top).with.offset(92);
+        make.width.equalTo(@60);
+        make.height.equalTo(@60);
+    }];
+    
+    [self.rightHeadView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.right.equalTo(self.view.mas_right).with.offset(-10);
+        make.bottom.equalTo(self.view.mas_bottom).with.offset(-155);
+        make.width.equalTo(@60);
+        make.height.equalTo(@60);
+    }];
+    
+    [self.topHeadView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.view.mas_top).with.offset(5);
+        make.centerX.equalTo(self.view.mas_centerX);
+        make.width.equalTo(@60);
+        make.height.equalTo(@60);
+    }];
+    
+    [self.bottomNameView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.bottomHeadView.mas_centerX);
+        make.top.equalTo(self.bottomHeadView.mas_bottom).with.offset(0);
+        make.width.equalTo(@85);
+        make.height.equalTo(@36);
+    }];
+    
+    [self.leftNameView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self.leftHeadView.mas_centerY);
+        make.left.equalTo(self.leftHeadView.mas_right).with.offset(0);
+        make.width.equalTo(@85);
+        make.height.equalTo(@36);
+    }];
+    
+    [self.rightNameView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self.rightHeadView.mas_centerY);
+        make.right.equalTo(self.rightHeadView.mas_left).with.offset(0);
+        make.width.equalTo(@85);
+        make.height.equalTo(@36);
+    }];
+    
+    [self.topNameView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self.topHeadView.mas_centerY);
+        make.left.equalTo(self.topHeadView.mas_right).with.offset(0);
+        make.width.equalTo(@85);
+        make.height.equalTo(@36);
+    }];
+    
+    [self.bottomOwnLabel mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.bottomHeadView.mas_centerX);
+        make.bottom.equalTo(self.bottomHeadView.mas_top).with.offset(-3);
+    }];
+    
+    [self.leftOwnLabel mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.leftHeadView.mas_centerX);
+        make.bottom.equalTo(self.leftHeadView.mas_top).with.offset(-3);
+    }];
+    
+    [self.rightOwnLabel mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.rightHeadView.mas_centerX);
+        make.bottom.equalTo(self.rightHeadView.mas_top).with.offset(-3);
+    }];
+    
+    [self.topOwnLabel mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self.topHeadView.mas_centerY);
+        make.right.equalTo(self.topHeadView.mas_left).with.offset(-3);
+    }];
+    
+    CGFloat gap = (DN_SCREEN_WIDTH - 10 * kCardWidth) / 2.0;
     
     [self.player1HandContainer mas_updateConstraints:^(MASConstraintMaker *make) {
         make.height.equalTo(@(kSelfNormalCardHeight*3));
@@ -72,12 +195,26 @@
         make.right.equalTo(self.view.mas_right).with.offset(-gap);
         make.bottom.equalTo(self.view.mas_bottom);
     }];
+    
+    [self.menuView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.right.equalTo(self.view.mas_right).with.offset(-98);
+        make.bottom.equalTo(self.view.mas_bottom).with.offset(-122.5);
+        make.height.equalTo(@36);
+        make.width.equalTo(@172.5);
+    }];
+    
+    [self.middleBoxView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.view.mas_centerX);
+        make.centerY.equalTo(self.view.mas_centerY).with.offset(-40);
+        make.width.equalTo(@165);
+        make.height.equalTo(@165);
+    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     self.player1HandContainer.backgroundColor = [UIColor clearColor];
-    
+    [self makeMenuBgImage];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
@@ -91,13 +228,41 @@
     self.playingCardViews = [[NSMutableArray alloc] init];
     
     for (DNPlayingCard *card in self.game.player1.hand) {
-        DNPlayingCardView *cardView = [[DNPlayingCardView alloc] initWithFrame:self.tableauView.frame];
+        DNPlayingCardView *cardView = [[DNPlayingCardView alloc] initWithFrame:CGRectMake(0, 0, kCardWidth, kSelfNormalCardHeight)];
+        [cardView setCenter:self.middleBoxView.center];
         cardView.playingCard = card;
         cardView.faceUp = NO;
         UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(cardPanGesture:)];
         [cardView addGestureRecognizer:panGesture];
-        [self.view addSubview:cardView];
+        [self.bgImageView addSubview:cardView];
         [self.playingCardViews addObject:cardView];
+    }
+}
+
+-(void)makeMenuBgImage
+{
+    UIImage *originImage = [UIImage imageNamed:@"rectangle"];
+    CGFloat top = 0; // 顶端盖高度
+    CGFloat bottom = 0 ; // 底端盖高度
+    CGFloat left = originImage.size.width / 2.0; // 左端盖宽度
+    CGFloat right = originImage.size.width - left - 1; // 右端盖宽度
+    UIEdgeInsets insets = UIEdgeInsetsMake(top, left, bottom, right);
+    UIImage *image = [originImage resizableImageWithCapInsets:insets resizingMode:UIImageResizingModeStretch];
+    self.menuView.bgImageView.image = image;
+}
+
+-(void)initHuAnimatonPicArr
+{
+    if (!self.huAnimationImageArr) {
+        self.huAnimationImageArr = [[NSMutableArray alloc] initWithCapacity:0];
+    }
+    if (self.huAnimationImageArr.count != 0) {
+        [self.huAnimationImageArr removeAllObjects];
+    }
+    for (int i = 0; i < 20; i ++) {
+        NSString *picName = [NSString stringWithFormat:@"hu_%d",i + 1];
+        UIImage *image = [UIImage imageNamed:picName];
+        [self.huAnimationImageArr addObject:image];
     }
 }
 
@@ -161,12 +326,13 @@
         [self playOutWithView:cardView];
     }else{
         NSInteger currentPoSection = fabs(gap / kCardWidth);
-        if (currentPoSection == cardView.section) {
+        if (currentPoSection == cardView.section || currentPoSection >= 10) {
             [self moveBackToOriginFrameWithView:cardView];
             return;
         }
         NSLog(@"currentPoSection = %ld", (long)currentPoSection);
         NSInteger maxRow = [self getMaxRowOfSection:currentPoSection];
+        NSInteger moveSectionMaxRow = [self getMaxRowOfSection:cardView.section];
         //当前section已经叠加了3张牌，移动回原来位置
         if (maxRow >= 2) {
             [self moveBackToOriginFrameWithView:cardView];
@@ -176,18 +342,31 @@
             }
             //移走牌后，那个section没有牌了
             BOOL needAdjustSection = NO;
-            CGFloat originSection = cardView.section;
-            if (cardView.row == 0 && [self getMaxRowOfSection:cardView.section] == 0)
+            BOOL needAdjustRow = NO;
+            NSInteger originSection = cardView.section;
+            NSInteger originRow = cardView.row;
+            if (cardView.row == 0 && moveSectionMaxRow == 0)
             {
                 needAdjustSection = YES;
+            }else if (cardView.row < moveSectionMaxRow){ //说明移动的不是最顶上的牌
+                needAdjustRow = YES;
             }
             cardView.section = (int)currentPoSection;
             cardView.row = (int)maxRow + 1;
-            [self.view sendSubviewToBack:cardView];
+            [self.bgImageView sendSubviewToBack:cardView];
             if(needAdjustSection){
                 for (DNPlayingCardView *card in self.playingCardViews) {
                     if (card.section > originSection) {
                         card.section --;
+                    }
+                }
+            }
+            if (needAdjustRow) {
+                for (DNPlayingCardView *card in self.playingCardViews) {
+                    if (card.section == originSection) {
+                        if (card.row > originRow) {
+                            card.row --;
+                        }
                     }
                 }
             }
@@ -232,7 +411,7 @@
     for (DNPlayingCardView *playingCardView in self.playingCardViews) {
         //大于10张牌，就放到第二行
         if (count >= 10) {
-            [self.view sendSubviewToBack:playingCardView];
+            [self.bgImageView sendSubviewToBack:playingCardView];
             row = 1;
         }
         //计算每张牌的起始坐标
@@ -310,7 +489,7 @@
 
 - (void)layDownSelectedCardsOntoTableau {
     // Determine positions of frames for selected cards
-    CGRect tableauFrame = self.tableauView.frame;
+    CGRect tableauFrame = CGRectZero;//self.tableauView.frame;
     CGFloat totalWidthOfSelection = tableauFrame.size.width + (self.standardOverlap * ([self.selectedCardViews count] - 1));
     CGFloat startingXPos = tableauFrame.origin.x + (tableauFrame.size.width / 2) - (totalWidthOfSelection / 2);
     
@@ -338,7 +517,7 @@
     // Condense previously played card views
     for (DNPlayingCardView *playingCardView in self.playedCardViews) {
         [UIView animateWithDuration:0.3 animations:^{
-            playingCardView.frame = self.tableauView.frame;
+//            playingCardView.frame = self.tableauView.frame;
         }];
     }
     [self.playedCardViews removeAllObjects];
@@ -396,7 +575,7 @@
             
         }];
     }
-    [self.view sendSubviewToBack:self.player1HandContainer];
+//    [self.view sendSubviewToBack:self.player1HandContainer];
 }
 
 #pragma mark - 拖动卡牌之后的操作
@@ -416,16 +595,14 @@
     
 }
 
-#pragma mark - getters
+#pragma mark - 胡牌动画
 
--(UIImageView *)tableauView
+-(void)huAnimation
 {
-    if (!_tableauView) {
-        _tableauView = [[UIImageView alloc] init];
-        _tableauView.backgroundColor = [UIColor redColor];
-    }
-    return _tableauView;
+    
 }
+
+#pragma mark - getters
 
 -(UIView *)player1HandContainer
 {
@@ -434,5 +611,154 @@
         _player1HandContainer.backgroundColor = [UIColor yellowColor];
     }
     return _player1HandContainer;
+}
+
+-(UIImageView *)bgImageView
+{
+    if (!_bgImageView) {
+        _bgImageView = [[UIImageView alloc] init];
+        _bgImageView.image = [UIImage imageNamed:@"game_bg"];
+        _bgImageView.contentMode = UIViewContentModeScaleAspectFill;
+        _bgImageView.userInteractionEnabled = YES;
+    }
+    return _bgImageView;
+}
+
+-(DNMenuView *)menuView
+{
+    if (!_menuView) {
+        _menuView = [[[NSBundle mainBundle] loadNibNamed:@"DNMenuView" owner:self options:nil] firstObject];
+        _menuView.backgroundColor = [UIColor clearColor];
+    }
+    return _menuView;
+}
+
+-(DNShowActivePlayerView *)middleBoxView
+{
+    if (!_middleBoxView) {
+        _middleBoxView = [[[NSBundle mainBundle] loadNibNamed:@"DNShowActivePlayerView" owner:self options:nil] firstObject];
+        _middleBoxView.backgroundColor = [UIColor clearColor];
+    }
+    return _middleBoxView;
+}
+
+-(DNHeadView *)bottomHeadView
+{
+    if (!_bottomHeadView) {
+        _bottomHeadView = [[DNHeadView alloc] init];
+    }
+    return _bottomHeadView;
+}
+
+-(DNHeadView *)leftHeadView
+{
+    if (!_leftHeadView) {
+        _leftHeadView = [[DNHeadView alloc] init];
+    }
+    return _leftHeadView;
+}
+
+-(DNHeadView *)rightHeadView
+{
+    if (!_rightHeadView) {
+        _rightHeadView = [[DNHeadView alloc] init];
+    }
+    return _rightHeadView;
+}
+
+-(DNHeadView *)topHeadView
+{
+    if (!_topHeadView) {
+        _topHeadView = [[DNHeadView alloc] init];
+    }
+    return _topHeadView;
+}
+
+-(DNNameView *)bottomNameView
+{
+    if (!_bottomNameView) {
+        _bottomNameView = [[[NSBundle mainBundle] loadNibNamed:@"DNNameView" owner:self options:nil] firstObject];
+    }
+    return _bottomNameView;
+}
+
+-(DNNameView *)leftNameView
+{
+    if (!_leftNameView) {
+        _leftNameView = [[[NSBundle mainBundle] loadNibNamed:@"DNNameView" owner:self options:nil] firstObject];
+    }
+    return _leftNameView;
+}
+
+-(DNNameView *)rightNameView
+{
+    if (!_rightNameView) {
+        _rightNameView = [[[NSBundle mainBundle] loadNibNamed:@"DNNameView" owner:self options:nil] firstObject];
+    }
+    return _rightNameView;
+}
+
+-(DNNameView *)topNameView
+{
+    if (!_topNameView) {
+        _topNameView = [[[NSBundle mainBundle] loadNibNamed:@"DNNameView" owner:self options:nil] firstObject];
+    }
+    return _topNameView;
+}
+
+-(UILabel *)bottomOwnLabel
+{
+    if (!_bottomOwnLabel) {
+        _bottomOwnLabel = [[UILabel alloc] init];
+        _bottomOwnLabel.font = [UIFont systemFontOfSize:15];
+        _bottomOwnLabel.textColor = [UIColor whiteColor];
+        _bottomOwnLabel.text = @"5胡";
+    }
+    return _bottomOwnLabel;
+}
+
+-(UILabel *)leftOwnLabel
+{
+    if (!_leftOwnLabel) {
+        _leftOwnLabel = [[UILabel alloc] init];
+        _leftOwnLabel.font = [UIFont systemFontOfSize:15];
+        _leftOwnLabel.textColor = [UIColor whiteColor];
+        _leftOwnLabel.text = @"5胡";
+    }
+    return _leftOwnLabel;
+}
+
+-(UILabel *)rightOwnLabel
+{
+    if (!_rightOwnLabel) {
+        _rightOwnLabel = [[UILabel alloc] init];
+        _rightOwnLabel.font = [UIFont systemFontOfSize:15];
+        _rightOwnLabel.textColor = [UIColor whiteColor];
+        _rightOwnLabel.text = @"5胡";
+    }
+    return _rightOwnLabel;
+}
+
+-(UILabel *)topOwnLabel
+{
+    if (!_topOwnLabel) {
+        _topOwnLabel = [[UILabel alloc] init];
+        _topOwnLabel.font = [UIFont systemFontOfSize:15];
+        _topOwnLabel.textColor = [UIColor whiteColor];
+        _topOwnLabel.text = @"5胡";
+    }
+    return _topOwnLabel;
+}
+
+-(UILabel *)roomInfoLabel
+{
+    if (!_roomInfoLabel) {
+        _roomInfoLabel = [[UILabel alloc] init];
+        _roomInfoLabel.textColor = RGBColorC(0xfecc45);
+        _roomInfoLabel.font = [UIFont systemFontOfSize:12];
+        _roomInfoLabel.numberOfLines = 0;
+        _roomInfoLabel.text = @"房间号：5423\n中庄 X 2\n强制胡牌\n局：2/5";
+    }
+    return _roomInfoLabel;
 }
 @end

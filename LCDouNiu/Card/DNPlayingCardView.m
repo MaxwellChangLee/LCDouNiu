@@ -12,6 +12,8 @@
 @interface DNPlayingCardView()
 
 @property (nonatomic, strong) UIImageView *cardKindImageView;
+@property (nonatomic, strong) UIImageView *bgImageView;
+@property (nonatomic, strong) UIImageView *grayBgView;
 
 @end
 
@@ -33,83 +35,41 @@
         self.opaque = NO;
         self.contentMode = UIViewContentModeRedraw;
         
-        /*
+        [self addSubview:self.bgImageView];
+        [self addSubview:self.grayBgView];
         [self addSubview:self.cardKindImageView];
-        [self.cardKindImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-            make.top.equalTo(self.mas_top).with.offset(5);
-            make.width.equalTo(self.mas_width);
-            make.height.equalTo(self.mas_width).multipliedBy(56 / 67.0);
-        }];
-         */
+
     }
     return self;
 }
 
--(void)drawRect:(CGRect)rect {
-    UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:self.bounds cornerRadius: [self cornerRadius]];
+-(void)layoutSubviews
+{
+    [super layoutSubviews];
     
-    [roundedRect addClip];
-    
-    [[UIColor lightGrayColor] setFill];
-    UIRectFill(self.bounds);
-    
-    [[UIColor blackColor] setStroke];
-    roundedRect.lineWidth = 3;
-    [roundedRect stroke];
-    
-    if (self.faceUp) {
-        //[self drawRankAndSuit];
-        [[UIImage imageNamed:@"card_large_10"] drawInRect:CGRectMake(0,
-                                                                     5,
-                                                                     self.bounds.size.width,
-                                                                     self.bounds.size.width * 56 / 67.0)];
-    } else {
-        [[UIImage imageNamed:@"cardback"] drawInRect:self.bounds];
+    [self.bgImageView setFrame:self.bounds];
+    [self.grayBgView setFrame:self.bounds];
+    if (!self.bgImageView.image) {
+        UIImage *originImage = [UIImage imageNamed:@"bg_zipai_noshadow"];
+        CGFloat top = originImage.size.height / 2.0; // 顶端盖高度
+        CGFloat bottom = originImage.size.height - top - 1 ; // 底端盖高度
+        CGFloat left = originImage.size.width / 2.0; // 左端盖宽度
+        CGFloat right = originImage.size.width - left - 1; // 右端盖宽度
+        UIEdgeInsets insets = UIEdgeInsetsMake(top, left, bottom, right);
+        UIImage *image = [originImage resizableImageWithCapInsets:insets resizingMode:UIImageResizingModeStretch];
+        self.bgImageView.image = image;
     }
-}
-
-
-#define CORNER_FONT_STANDARD_HEIGHT 180.0
-#define CORNER_RADIUS 12.0
-
-- (CGFloat)cornerScaleFactor { return self.bounds.size.height / CORNER_FONT_STANDARD_HEIGHT; }
-- (CGFloat)cornerRadius { return CORNER_RADIUS * [self cornerScaleFactor]; }
-- (CGFloat)cornerOffset { return [self cornerRadius] / 3.0; }
-
-
-- (void)drawRankAndSuit {
-    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.alignment = NSTextAlignmentCenter;
-    
-    UIFont *font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-    font = [font fontWithSize:font.pointSize * [self cornerScaleFactor]];
-    
-    
-    UIColor *color;
-    if (self.playingCard.isSuitRed) {
-        color = [UIColor redColor];
-    } else {
-        color = [UIColor blackColor];
+    if (!self.grayBgView.image) {
+        UIImage *originImage = [UIImage imageNamed:@"card_backGround"];
+        CGFloat top = originImage.size.height / 2.0; // 顶端盖高度
+        CGFloat bottom = originImage.size.height - top - 1 ; // 底端盖高度
+        CGFloat left = originImage.size.width / 2.0; // 左端盖宽度
+        CGFloat right = originImage.size.width - left - 1; // 右端盖宽度
+        UIEdgeInsets insets = UIEdgeInsetsMake(top, left, bottom, right);
+        UIImage *image = [originImage resizableImageWithCapInsets:insets resizingMode:UIImageResizingModeStretch];
+        self.grayBgView.image = image;
     }
-    
-    NSString *rankAndSuitString = [NSString stringWithFormat:@"%@\n%@", [self.playingCard rankAsString], self.playingCard.suit];
-    NSDictionary * attributes = @{
-                                  NSFontAttributeName : font,
-                                  NSParagraphStyleAttributeName : paragraphStyle,
-                                  NSForegroundColorAttributeName : color};
-    NSAttributedString *attributedRankAndSuitString = [[NSAttributedString alloc] initWithString:rankAndSuitString attributes:attributes];
-    
-    CGRect textBounds;
-    textBounds.origin = CGPointMake([self cornerOffset], [self cornerOffset]);
-    textBounds.size = [attributedRankAndSuitString size];
-    [attributedRankAndSuitString drawInRect:textBounds];
-    
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    //    CGContextSaveGState(context);
-    CGContextTranslateCTM(context, self.bounds.size.width, self.bounds.size.height);
-    CGContextRotateCTM(context, M_PI);
-    
-    [attributedRankAndSuitString drawInRect:textBounds];
+    [self.cardKindImageView setFrame:CGRectMake(self.frame.size.width / 2 - 15, 5, 30, 30)];
 }
 
 - (void)setPlayingCard:(DNPlayingCard *)playingCard {
@@ -128,5 +88,21 @@
         _cardKindImageView.image = [UIImage imageNamed:@"card_large_10"];
     }
     return _cardKindImageView;
+}
+
+-(UIImageView *)bgImageView
+{
+    if (!_bgImageView) {
+        _bgImageView = [[UIImageView alloc] init];
+    }
+    return _bgImageView;
+}
+
+-(UIImageView *)grayBgView
+{
+    if (!_grayBgView) {
+        _grayBgView = [[UIImageView alloc] init];
+    }
+    return _grayBgView;
 }
 @end

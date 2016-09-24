@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="DNNameView">
+            <rect key="frame" x="0.0" y="0.0" width="408" height="152"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bTc-mq-ejS">
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="呼拉拉" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VIa-SL-ZxH">
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="总胡：3" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HVg-3y-rfe">
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="HVg-3y-rfe" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="JAf-Vw-e6d"/>
+                <constraint firstAttribute="bottom" secondItem="bTc-mq-ejS" secondAttribute="bottom" id="Ni6-Tg-Sj0"/>
+                <constraint firstItem="VIa-SL-ZxH" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Oip-Sa-NwX"/>
+                <constraint firstAttribute="trailing" secondItem="bTc-mq-ejS" secondAttribute="trailing" id="SPB-Zg-jXA"/>
+                <constraint firstItem="bTc-mq-ejS" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="VWl-O5-Jxc"/>
+                <constraint firstItem="HVg-3y-rfe" firstAttribute="top" secondItem="VIa-SL-ZxH" secondAttribute="bottom" constant="2" id="Vij-gr-oby"/>
+                <constraint firstItem="bTc-mq-ejS" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="aEu-Ih-vNy"/>
+                <constraint firstItem="HVg-3y-rfe" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="ddn-hm-6zZ"/>
+                <constraint firstItem="VIa-SL-ZxH" firstAttribute="top" secondItem="bTc-mq-ejS" secondAttribute="top" constant="2" id="flP-3X-vJb"/>
+                <constraint firstAttribute="trailing" secondItem="HVg-3y-rfe" secondAttribute="trailing" id="pqh-ro-3ZP"/>
+                <constraint firstAttribute="trailing" secondItem="VIa-SL-ZxH" secondAttribute="trailing" id="qce-eL-NJX"/>
+                <constraint firstItem="VIa-SL-ZxH" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="zex-qg-wr7"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="blackBgView" destination="bTc-mq-ejS" id="qE4-dD-myW"/>
+                <outlet property="nameLabel" destination="VIa-SL-ZxH" id="rd7-16-caJ"/>
+                <outlet property="ownLabel" destination="HVg-3y-rfe" id="1Xe-Qi-Eq3"/>
+            </connections>
+            <point key="canvasLocation" x="50" y="-203"/>
+        </view>
+    </objects>
+</document>
