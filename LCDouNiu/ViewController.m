@@ -13,15 +13,25 @@
 #import "DNShowActivePlayerView.h"
 #import "DNHeadView.h"
 #import "DNNameView.h"
+#import "DNPortraitLargePlayingCardView.h"
+#import "DNLandScapeLargePlayingCardView.h"
 
-#define kCardWidth 43 //自己手牌宽度
-#define kSelfNormalCardHeight 50.5 //自己手牌第一层的牌高度
-#define kSelfFoldCardHeight 36.0 //自己手牌第二层第三层的牌高度
+#define kCoinCountKey   10     //金币总数
+
+#define kLittleCardWidth 20
+#define kLittleCardHeight 18
+
+#define kCardWidth 36 //自己手牌宽度
+#define kSelfNormalCardHeight 45 //自己手牌第一层的牌高度
+#define kSelfFoldCardHeight 30 //自己手牌第二层第三层的牌高度
 
 #define kGiveCardAnimationTime 0.3 //发牌动画时间
 #define kMoveCardAnimationTime 0.3 //牌重新布局的动画时间
+#define kPlayOutAnimationTime  0.3 //打牌出去的动画时间
 
-@interface ViewController ()
+#define kPlayOutViewBaseTag 1234
+
+@interface ViewController ()<CAAnimationDelegate>
 
 @property (nonatomic, strong) UIImageView *bgImageView;              //背景图片
 @property (nonatomic, strong) DNMenuView *menuView;                  //吃碰胡过
@@ -49,6 +59,14 @@
 @property (nonatomic, strong) UIImageView *topAnimationView;
 
 @property (nonatomic, strong) UILabel *roomInfoLabel;
+
+@property (nonatomic, strong) UIButton *settingButton;
+@property (nonatomic, strong) UIButton *messageButton;
+@property (nonatomic, strong) UIButton *voiceButton;
+
+@property (nonatomic, strong) DNPortraitLargePlayingCardView *portraitPlayOutCardView;
+@property (nonatomic, strong) DNLandScapeLargePlayingCardView *landScapePlayoutCardView;
+
 //手中的牌
 @property (strong, nonatomic) NSMutableArray *playingCardViews;
 //选中的牌
@@ -58,12 +76,17 @@
 
 @property (nonatomic, strong) NSMutableArray *huAnimationImageArr;
 
+@property (nonatomic, strong) NSMutableArray  *coinTagsArr;  //存放生成的所有金币对应的tag值
+
 //拖动之前的位置
 @property (nonatomic, assign) CGRect originFrame;
 
 @end
 
 @implementation ViewController
+{
+    NSTimer *_testTimer;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -95,14 +118,27 @@
     [self.view addSubview:self.rightAnimationView];
     [self.view addSubview:self.topAnimationView];
     
+    [self.view addSubview:self.portraitPlayOutCardView];
+    [self.view addSubview:self.landScapePlayoutCardView];
+    
+    [self.view addSubview:self.settingButton];
+    [self.view addSubview:self.messageButton];
+    [self.view addSubview:self.voiceButton];
+    
     [self.view addSubview:self.middleBoxView];
     [self.view addSubview:self.menuView];
     [self layoutSubviewsOfSelf];
+    
+    [self makeLeftFakeCards];
+    [self makeRightFakeCards];
+    [self makeBottomFakeCards];
+    [self makeTopFakeCards];
     
     self.game = [[DNGame alloc] init];
     self.game.player1.name = self.player1Name;
     self.selectedCardViews = [[NSMutableArray alloc] init];
     self.playedCardViews = [[NSMutableArray alloc] init];
+    self.coinTagsArr = [[NSMutableArray alloc] init];
     [self.game.player1 displayHand];
     
     [self initHuAnimatonPicArr];
@@ -198,8 +234,21 @@
     [self.leftAnimationView mas_updateConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.leftNameView.mas_right);
         make.centerY.equalTo(self.leftNameView.mas_centerY);
-        make.width.equalTo(@150);
-        make.height.equalTo(@125);
+    }];
+    
+    [self.bottomAnimationView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.middleBoxView.mas_centerX);
+        make.top.equalTo(self.middleBoxView.mas_bottom).with.offset(-20);
+    }];
+    
+    [self.rightAnimationView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self.rightNameView.mas_centerY);
+        make.right.equalTo(self.rightNameView.mas_left);
+    }];
+    
+    [self.topAnimationView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.topNameView.mas_centerX);
+        make.top.equalTo(self.topHeadView.mas_bottom);
     }];
     
     CGFloat gap = (DN_SCREEN_WIDTH - 10 * kCardWidth) / 2.0;
@@ -224,6 +273,30 @@
         make.width.equalTo(@165);
         make.height.equalTo(@165);
     }];
+    
+    [self.settingButton mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.right.equalTo(self.view.mas_right).with.offset(-10);
+        make.top.equalTo(self.view.mas_top).with.offset(12.5);
+        make.width.equalTo(@39);
+        make.height.equalTo(@41);
+    }];
+    
+    [self.voiceButton mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.right.equalTo(self.view.mas_right).with.offset(-10);
+        make.bottom.equalTo(self.view.mas_bottom).with.offset(-12.5);
+        make.width.equalTo(@39);
+        make.height.equalTo(@41);
+    }];
+    
+    [self.messageButton mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.right.equalTo(self.view.mas_right).with.offset(-10);
+        make.bottom.equalTo(self.voiceButton.mas_top).with.offset(-12);
+        make.width.equalTo(@39);
+        make.height.equalTo(@41);
+    }];
+    
+    [self.portraitPlayOutCardView setCenter:CGPointMake(190, 120)];
+    [self.landScapePlayoutCardView setCenter:CGPointMake(DN_SCREEN_WIDTH + 48, 240)];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -236,6 +309,7 @@
     [super viewDidAppear:animated];
     [self createCardViews];
     [self dealCardViews];
+    [self performSelector:@selector(startTest_bottom) withObject:nil afterDelay:2];
 }
 
 - (void) createCardViews {
@@ -277,6 +351,72 @@
         NSString *picName = [NSString stringWithFormat:@"hu_%d",i + 1];
         UIImage *image = [UIImage imageNamed:picName];
         [self.huAnimationImageArr addObject:image];
+    }
+}
+
+#pragma mark - 创建吃的牌碰的牌打出去的牌
+
+-(void)makeLeftFakeCards
+{
+    CGFloat poX = 90;
+    CGFloat poY = 170;
+    for (int i = 0; i < 3; i ++) {
+        CGFloat cardX = poX;
+        CGFloat cardY = poY + i * kLittleCardHeight;
+        
+        DNPlayingCardView *playingCard = [[DNPlayingCardView alloc] initWithFrame:CGRectMake(cardX,
+                                                                                             cardY,
+                                                                                             kLittleCardWidth,
+                                                                                             kLittleCardHeight)];
+        [self.view addSubview:playingCard];
+    }
+}
+
+-(void)makeRightFakeCards
+{
+    CGFloat poX = DN_SCREEN_WIDTH - 108;
+    CGFloat poY = 80;
+    for (int i = 0; i < 9; i ++) {
+        CGFloat cardX = poX + i / 3 * kLittleCardWidth;
+        CGFloat cardY = poY + (i % 3) * kLittleCardHeight;
+        
+        DNPlayingCardView *playingCard = [[DNPlayingCardView alloc] initWithFrame:CGRectMake(cardX,
+                                                                                             cardY,
+                                                                                             kLittleCardWidth,
+                                                                                             kLittleCardHeight)];
+        [self.view addSubview:playingCard];
+    }
+}
+
+-(void)makeTopFakeCards
+{
+    CGFloat poX = DN_SCREEN_WIDTH - 207.5;
+    CGFloat poY = 10;
+    for (int i = 0; i < 9; i ++) {
+        CGFloat cardX = poX + i / 3 * kLittleCardWidth;
+        CGFloat cardY = poY + (i % 3) * kLittleCardHeight;
+        
+        DNPlayingCardView *playingCard = [[DNPlayingCardView alloc] initWithFrame:CGRectMake(cardX,
+                                                                                             cardY,
+                                                                                             kLittleCardWidth,
+                                                                                             kLittleCardHeight)];
+        [self.view addSubview:playingCard];
+    }
+}
+
+-(void)makeBottomFakeCards
+{
+    CGFloat poX = DN_SCREEN_WIDTH - 120;
+    CGFloat poY = DN_SCREEN_HEIGHT - 100;
+    for (int i = 0; i < 9; i ++) {
+        CGFloat cardX = poX + i / 3 * kLittleCardWidth;
+        CGFloat cardY = poY + (i % 3) * kLittleCardHeight;
+        
+        DNPlayingCardView *playingCard = [[DNPlayingCardView alloc] initWithFrame:CGRectMake(cardX,
+                                                                                             cardY,
+                                                                                             kLittleCardWidth,
+                                                                                             kLittleCardHeight)];
+        [self.view addSubview:playingCard];
     }
 }
 
@@ -326,37 +466,7 @@
             [self moveBackToOriginFrameWithView:cardView];
             return;
         }
-        NSInteger moveSectionMaxRow = [self getMaxRowOfSection:cardView.section];
-
-        //移走牌后，那个section没有牌了
-        BOOL needAdjustSection = NO;
-        //移走的不是最顶上的牌
-        BOOL needAdjustRow = NO;
-        NSInteger originSection = cardView.section;
-        NSInteger originRow = cardView.row;
-        if (cardView.row == 0 && moveSectionMaxRow == 0)
-        {
-            needAdjustSection = YES;
-        }else if (cardView.row < moveSectionMaxRow){ //说明移动的不是最顶上的牌
-            needAdjustRow = YES;
-        }
-        [self.bgImageView sendSubviewToBack:cardView];
-        if(needAdjustSection){
-            for (DNPlayingCardView *card in self.playingCardViews) {
-                if (card.section > originSection) {
-                    card.section --;
-                }
-            }
-        }
-        if (needAdjustRow) {
-            for (DNPlayingCardView *card in self.playingCardViews) {
-                if (card.section == originSection) {
-                    if (card.row > originRow) {
-                        card.row --;
-                    }
-                }
-            }
-        }
+        [self resetRowAndSectionWithMovedView:cardView];
         cardView.section = 0;
         cardView.row = 0;
         for (DNPlayingCardView *card in self.playingCardViews) {
@@ -367,6 +477,10 @@
         [self reLayoutAllCardView];
     }else if(gap > self.player1HandContainer.frame.size.width + kCardWidth / 2.0){
         [self playOutWithView:cardView]; //将牌打出
+        [self resetRowAndSectionWithMovedView:cardView];
+        [self reLayoutAllCardView];
+        [self.playingCardViews removeObject:cardView];
+        [cardView removeFromSuperview];
     }else{
         NSInteger currentPoSection = fabs(gap / kCardWidth);
         if (currentPoSection == cardView.section || currentPoSection >= 10) {
@@ -419,14 +533,81 @@
     }
 }
 
+-(void)resetRowAndSectionWithMovedView:(DNPlayingCardView *)cardView
+{
+    NSInteger moveSectionMaxRow = [self getMaxRowOfSection:cardView.section];
+    
+    //移走牌后，那个section没有牌了
+    BOOL needAdjustSection = NO;
+    //移走的不是最顶上的牌
+    BOOL needAdjustRow = NO;
+    NSInteger originSection = cardView.section;
+    NSInteger originRow = cardView.row;
+    if (cardView.row == 0 && moveSectionMaxRow == 0)
+    {
+        needAdjustSection = YES;
+    }else if (cardView.row < moveSectionMaxRow){ //说明移动的不是最顶上的牌
+        needAdjustRow = YES;
+    }
+    [self.bgImageView sendSubviewToBack:cardView];
+    if(needAdjustSection){
+        for (DNPlayingCardView *card in self.playingCardViews) {
+            if (card.section > originSection) {
+                card.section --;
+            }
+        }
+    }
+    if (needAdjustRow) {
+        for (DNPlayingCardView *card in self.playingCardViews) {
+            if (card.section == originSection) {
+                if (card.row > originRow) {
+                    card.row --;
+                }
+            }
+        }
+    }
+}
+
 #pragma mark - event
 
 -(void)huButtonClick:(UIButton *)button
 {
-    self.leftAnimationView.animationImages = self.huAnimationImageArr;
-    self.leftAnimationView.animationRepeatCount = 1;
-    self.leftAnimationView.animationDuration = 1;
-    [self.leftAnimationView startAnimating];
+    [self huAnimation];
+}
+
+-(void)chiButtonClick:(UIButton *)button
+{
+    [self chiAnimation];
+}
+
+-(void)guoButtonClick:(UIButton *)button
+{
+    [self kanAnimation];
+}
+
+-(void)pengButtonClick:(UIButton *)button
+{
+    [self pengAnimation];
+}
+
+-(void)clearBottomImage:(UIImageView *)imageView
+{
+    self.bottomAnimationView.image = nil;
+}
+
+-(void)clearTopImage:(UIImageView *)imageView
+{
+    self.topAnimationView.image = nil;
+}
+
+-(void)clearLeftImage:(UIImageView *)imageView
+{
+    self.leftAnimationView.image = nil;
+}
+
+-(void)clearRightImage:(UIImageView *)imageView
+{
+    self.rightAnimationView.image = nil;
 }
 
 #pragma mark - 起始发牌动画
@@ -549,15 +730,226 @@
 //把牌打出去
 -(void)playOutWithView:(DNPlayingCardView *)cardView
 {
-    
+    DNLandScapeLargePlayingCardView *playOutView =  [[DNLandScapeLargePlayingCardView alloc] initWithFrame:CGRectMake(0, 0, 108, 42)];
+    BOOL removeTagView = NO;
+    if ([self.view viewWithTag:kPlayOutViewBaseTag]) {
+        removeTagView = YES;
+        playOutView.tag = kPlayOutViewBaseTag + 1;
+    }else{
+        removeTagView = NO;
+        playOutView.tag = kPlayOutViewBaseTag;
+    }
+    [playOutView setCenter:CGPointMake(DN_SCREEN_WIDTH + 48, 240)];
+    [self.view addSubview:playOutView];
+    [UIView animateWithDuration:kPlayOutAnimationTime
+                     animations:^{
+        [playOutView setCenter:CGPointMake(self.view.center.x, self.landScapePlayoutCardView.center.y)];
+    } completion:^(BOOL finished) {
+        if (removeTagView) {
+            [[self.view viewWithTag:kPlayOutViewBaseTag] removeFromSuperview];
+        }else{
+            [[self.view viewWithTag:kPlayOutViewBaseTag + 1] removeFromSuperview];
+        }
+    }];
 }
 
 #pragma mark - 胡牌动画
 
 -(void)huAnimation
 {
+    self.leftAnimationView.animationImages = self.huAnimationImageArr;
+    self.leftAnimationView.animationRepeatCount = 1;
+    self.leftAnimationView.animationDuration = 1;
+    [self.leftAnimationView startAnimating];
     
+    [self getCoinAction];
 }
+
+#pragma mark - 吃 扫 碰 等动画
+
+-(void)chiAnimation
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(clearBottomImage:)
+                                               object:self.bottomAnimationView];
+    
+    self.bottomAnimationView.image = [UIImage imageNamed:@"icon_action_toast_chi"];
+    
+    CAKeyframeAnimation *k = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
+    k.values = @[@(0.8),@(2.0),@(1.1)];
+    k.keyTimes = @[@(0.0),@(0.5),@(0.8),@(1.0)];
+    k.calculationMode = kCAAnimationLinear;
+    
+    [self.bottomAnimationView.layer addAnimation:k forKey:@"SHOW"];
+    
+    [self performSelector:@selector(clearBottomImage:)
+               withObject:self.bottomAnimationView
+               afterDelay:1.5];
+}
+
+-(void)pengAnimation
+{
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(clearRightImage:)
+                                               object:self.rightAnimationView];
+    
+    self.rightAnimationView.image = [UIImage imageNamed:@"icon_action_toast_kan"];
+    
+    CAKeyframeAnimation *k = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
+    k.values = @[@(0.8),@(2.0),@(1.1)];
+    k.keyTimes = @[@(0.0),@(0.5),@(0.8),@(1.0)];
+    k.calculationMode = kCAAnimationLinear;
+    
+    [self.rightAnimationView.layer addAnimation:k forKey:@"SHOW"];
+    
+    [self performSelector:@selector(clearRightImage:)
+               withObject:self.rightAnimationView
+               afterDelay:1.5];
+}
+
+-(void)kanAnimation
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(clearTopImage:)
+                                               object:self.bottomAnimationView];
+    
+    self.topAnimationView.image = [UIImage imageNamed:@"icon_action_toast_sao"];
+    
+    CAKeyframeAnimation *k = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
+    k.values = @[@(0.8),@(2.0),@(1.1)];
+    k.keyTimes = @[@(0.0),@(0.5),@(0.8),@(1.0)];
+    k.calculationMode = kCAAnimationLinear;
+    
+    [self.topAnimationView.layer addAnimation:k forKey:@"SHOW"];
+    
+    [self performSelector:@selector(clearTopImage:)
+               withObject:self.topAnimationView
+               afterDelay:1.5];
+}
+
+#pragma mark - 金币移动动画
+
+static int coinCount = 0;
+
+- (void)getCoinAction
+{
+    //初始化金币生成的数量
+    coinCount = 0;
+    for (int i = 0; i < kCoinCountKey; i++) {
+        
+        //延迟调用函数
+        [self performSelector:@selector(initCoinViewWithInt:) withObject:[NSNumber numberWithInt:i] afterDelay:i * 0.05];
+    }
+}
+
+- (void)initCoinViewWithInt:(NSNumber *)i
+{
+    UIImageView *coin = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_glod"]];
+    
+    //初始化金币的最终位置
+    coin.center = self.leftHeadView.center;
+    coin.tag = [i intValue] + 1;
+    //每生产一个金币,就把该金币对应的tag加入到数组中,用于判断当金币结束动画时和福袋交换层次关系,并从视图上移除
+    [_coinTagsArr addObject:[NSNumber numberWithLong:coin.tag]];
+    
+    [self.view addSubview:coin];
+    
+    [self setAnimationWithLayer:coin];
+}
+
+- (void)setAnimationWithLayer:(UIView *)coin
+{
+    CGFloat duration = 1.6f;
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    //绘制从底部到福袋口之间的抛物线
+    CGFloat positionX   = coin.layer.position.x;    //终点x
+    CGFloat positionY   = coin.layer.position.y;    //终点y
+    CGMutablePathRef path = CGPathCreateMutable();
+    int fromX       = self.rightHeadView.center.x;//arc4random() % 320;     //起始位置:x轴上随机生成一个位置
+    int height      = self.rightHeadView.center.y;//[UIScreen mainScreen].bounds.size.height + coin.frame.size.height; //y轴以屏幕高度为准
+    int fromY       = arc4random() % (int)positionY; //起始位置:生成位于福袋上方的随机一个y坐标
+    
+    CGFloat cpx = positionX + (fromX - positionX)/2;    //x控制点
+    CGFloat cpy = fromY / 2 - positionY;                //y控制点,确保抛向的最大高度在屏幕内,并且在福袋上方(负数)
+    
+    //动画的起始位置
+    CGPathMoveToPoint(path, NULL, fromX, height);
+    CGPathAddQuadCurveToPoint(path, NULL, cpx, cpy, positionX, positionY);
+    
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    [animation setPath:path];
+    CFRelease(path);
+    path = nil;
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    //图像由大到小的变化动画
+    CGFloat from3DScale = 1 + arc4random() % 10 *0.1;
+    CGFloat to3DScale = from3DScale * 0.5;
+    CAKeyframeAnimation *scaleAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+    scaleAnimation.values = @[[NSValue valueWithCATransform3D:CATransform3DMakeScale(from3DScale, from3DScale, from3DScale)], [NSValue valueWithCATransform3D:CATransform3DMakeScale(to3DScale, to3DScale, to3DScale)]];
+    scaleAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut], [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    //动画组合
+    CAAnimationGroup *group = [CAAnimationGroup animation];
+    group.delegate = self;
+    group.duration = duration;
+    group.fillMode = kCAFillModeForwards;
+    group.removedOnCompletion = NO;
+    group.animations = @[scaleAnimation, animation];
+    [coin.layer addAnimation:group forKey:@"position and transform"];
+}
+
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
+{
+    if (flag) {
+        //动画完成后把金币和数组对应位置上的tag移除
+        UIView *coinView = (UIView *)[self.view viewWithTag:[[_coinTagsArr firstObject] intValue]];
+        
+        [coinView removeFromSuperview];
+        [_coinTagsArr removeObjectAtIndex:0];
+    }
+}
+
+#pragma mark - 测试
+
+-(void)startTest_bottom
+{
+    [self.middleBoxView hideAllScore];
+    [self.middleBoxView pointTo:DNShowActivePlayerViewDirectionBottom];
+    self.menuView.chiButton.selected = YES;
+    [self chiButtonClick:self.menuView.chiButton];
+    [self performSelector:@selector(startTest_right) withObject:nil afterDelay:1.5];
+}
+
+-(void)startTest_right
+{
+    self.menuView.chiButton.selected = NO;
+    [self.middleBoxView pointTo:DNShowActivePlayerViewDirectionRight];
+    [self pengButtonClick:self.menuView.pengButton];
+    [self performSelector:@selector(startTest_top) withObject:nil afterDelay:1.5];
+}
+
+-(void)startTest_top
+{
+    [self.middleBoxView pointTo:DNShowActivePlayerViewDirectionTop];
+    [self guoButtonClick:self.menuView.guoButton];
+    [self performSelector:@selector(startTest_left) withObject:nil afterDelay:1.5];
+}
+
+-(void)startTest_left
+{
+    [self.middleBoxView pointTo:DNShowActivePlayerViewDirectionLeft];
+    [self.middleBoxView showScoreResult:@{@(0):@"-5胡",
+                                          @(1):@"+15胡",
+                                          @(2):@"-5胡",
+                                          @(3):@"-5胡"}];
+    [self huButtonClick:self.menuView.huButton];
+    [self performSelector:@selector(startTest_bottom) withObject:nil afterDelay:1.5];
+}
+
 
 #pragma mark - getters
 
@@ -588,6 +980,15 @@
         [_menuView.huButton addTarget:self
                                action:@selector(huButtonClick:)
                      forControlEvents:UIControlEventTouchUpInside];
+        [_menuView.chiButton addTarget:self
+                                action:@selector(chiButtonClick:)
+                      forControlEvents:UIControlEventTouchUpInside];
+        [_menuView.pengButton addTarget:self
+                                 action:@selector(guoButtonClick:)
+                       forControlEvents:UIControlEventTouchUpInside];
+        [_menuView.guoButton addTarget:self
+                                 action:@selector(pengButtonClick:)
+                       forControlEvents:UIControlEventTouchUpInside];
         _menuView.backgroundColor = [UIColor clearColor];
     }
     return _menuView;
@@ -752,5 +1153,51 @@
         _topAnimationView = [[UIImageView alloc] init];
     }
     return _topAnimationView;
+}
+
+-(UIButton *)settingButton
+{
+    if (!_settingButton) {
+        _settingButton = [[UIButton alloc] init];
+        [_settingButton setImage:[UIImage imageNamed:@"setting"]
+                        forState:UIControlStateNormal];
+    }
+    return _settingButton;
+}
+
+-(UIButton *)messageButton
+{
+    if (!_messageButton) {
+        _messageButton = [[UIButton alloc] init];
+        [_messageButton setImage:[UIImage imageNamed:@"message"]
+                        forState:UIControlStateNormal];
+    }
+    return _messageButton;
+}
+
+-(UIButton *)voiceButton
+{
+    if (!_voiceButton) {
+        _voiceButton = [[UIButton alloc] init];
+        [_voiceButton setImage:[UIImage imageNamed:@"voice"]
+                      forState:UIControlStateNormal];
+    }
+    return _voiceButton;
+}
+
+-(DNPortraitLargePlayingCardView *)portraitPlayOutCardView
+{
+    if (!_portraitPlayOutCardView) {
+        _portraitPlayOutCardView = [[DNPortraitLargePlayingCardView alloc] initWithFrame:CGRectMake(0, 0, 42, 96)];
+    }
+    return _portraitPlayOutCardView;
+}
+
+-(DNLandScapeLargePlayingCardView *)landScapePlayoutCardView
+{
+    if (!_landScapePlayoutCardView) {
+        _landScapePlayoutCardView = [[DNLandScapeLargePlayingCardView alloc] initWithFrame:CGRectMake(0, 0, 108, 42)];
+    }
+    return _landScapePlayoutCardView;
 }
 @end

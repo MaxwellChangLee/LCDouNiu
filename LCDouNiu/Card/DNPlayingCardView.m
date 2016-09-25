@@ -47,6 +47,9 @@
 {
     [super layoutSubviews];
     
+    CGFloat cardWidth = self.frame.size.width * 3 / 5;
+    CGFloat topGap = (self.frame.size.height - cardWidth) / 2;
+    
     [self.bgImageView setFrame:self.bounds];
     [self.grayBgView setFrame:self.bounds];
     if (!self.bgImageView.image) {
@@ -69,7 +72,10 @@
         UIImage *image = [originImage resizableImageWithCapInsets:insets resizingMode:UIImageResizingModeStretch];
         self.grayBgView.image = image;
     }
-    [self.cardKindImageView setFrame:CGRectMake(self.frame.size.width / 2 - 15, 5, 30, 30)];
+    if (topGap > 5) {
+        topGap = 5;
+    }
+    [self.cardKindImageView setFrame:CGRectMake(self.frame.size.width / 2 - cardWidth / 2, topGap, cardWidth, cardWidth)];
 }
 
 - (void)setPlayingCard:(DNPlayingCard *)playingCard {
@@ -85,7 +91,15 @@
 {
     if (!_cardKindImageView) {
         _cardKindImageView = [[UIImageView alloc] init];
-        _cardKindImageView.image = [UIImage imageNamed:@"card_large_10"];
+        NSString *imageStr = @"card";
+        NSArray *arr = @[@"little", @"large"];
+        int i = arc4random() % 2;
+        if (i < arr.count) {
+            imageStr = [NSString stringWithFormat:@"%@_%@", imageStr, arr[i]];
+        }
+        int j = arc4random() % 10 + 1;
+        imageStr = [NSString stringWithFormat:@"%@_%d", imageStr, j];
+        _cardKindImageView.image = [UIImage imageNamed:imageStr];
     }
     return _cardKindImageView;
 }

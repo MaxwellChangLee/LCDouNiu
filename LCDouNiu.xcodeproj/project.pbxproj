@@ -115,6 +115,15 @@
 		5098FC291D9260A7007AF211 /* View+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5098FC1B1D9260A7007AF211 /* View+MASAdditions.m */; };
 		5098FC2A1D9260A7007AF211 /* ViewController+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5098FC1E1D9260A7007AF211 /* ViewController+MASAdditions.m */; };
 		5098FC2B1D9260A7007AF211 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 5098FC1F1D9260A7007AF211 /* README.md */; };
+		50AF1A871D97A1FE00D7C9BE /* icon_action_toast_chi@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 50AF1A811D97A1FE00D7C9BE /* icon_action_toast_chi@2x.png */; };
+		50AF1A881D97A1FE00D7C9BE /* icon_action_toast_kan@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 50AF1A821D97A1FE00D7C9BE /* icon_action_toast_kan@2x.png */; };
+		50AF1A891D97A1FE00D7C9BE /* icon_action_toast_pao@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 50AF1A831D97A1FE00D7C9BE /* icon_action_toast_pao@2x.png */; };
+		50AF1A8A1D97A1FE00D7C9BE /* icon_action_toast_peng@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 50AF1A841D97A1FE00D7C9BE /* icon_action_toast_peng@2x.png */; };
+		50AF1A8B1D97A1FE00D7C9BE /* icon_action_toast_sao@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 50AF1A851D97A1FE00D7C9BE /* icon_action_toast_sao@2x.png */; };
+		50AF1A8C1D97A1FE00D7C9BE /* icon_action_toast_ti@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 50AF1A861D97A1FE00D7C9BE /* icon_action_toast_ti@2x.png */; };
+		50AF1A941D97C64300D7C9BE /* icon_glod@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 50AF1A931D97C64300D7C9BE /* icon_glod@2x.png */; };
+		50AF1A971D97C95400D7C9BE /* DNPortraitLargePlayingCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 50AF1A961D97C95300D7C9BE /* DNPortraitLargePlayingCardView.m */; };
+		50AF1A9A1D97D1DC00D7C9BE /* DNLandScapeLargePlayingCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 50AF1A991D97D1DC00D7C9BE /* DNLandScapeLargePlayingCardView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -277,6 +286,17 @@
 		5098FC1E1D9260A7007AF211 /* ViewController+MASAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViewController+MASAdditions.m"; sourceTree = "<group>"; };
 		5098FC1F1D9260A7007AF211 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5098FC7D1D92A48D007AF211 /* DNMacro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DNMacro.h; sourceTree = "<group>"; };
+		50AF1A811D97A1FE00D7C9BE /* icon_action_toast_chi@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_action_toast_chi@2x.png"; sourceTree = "<group>"; };
+		50AF1A821D97A1FE00D7C9BE /* icon_action_toast_kan@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_action_toast_kan@2x.png"; sourceTree = "<group>"; };
+		50AF1A831D97A1FE00D7C9BE /* icon_action_toast_pao@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_action_toast_pao@2x.png"; sourceTree = "<group>"; };
+		50AF1A841D97A1FE00D7C9BE /* icon_action_toast_peng@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_action_toast_peng@2x.png"; sourceTree = "<group>"; };
+		50AF1A851D97A1FE00D7C9BE /* icon_action_toast_sao@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_action_toast_sao@2x.png"; sourceTree = "<group>"; };
+		50AF1A861D97A1FE00D7C9BE /* icon_action_toast_ti@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_action_toast_ti@2x.png"; sourceTree = "<group>"; };
+		50AF1A931D97C64300D7C9BE /* icon_glod@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_glod@2x.png"; sourceTree = "<group>"; };
+		50AF1A951D97C95300D7C9BE /* DNPortraitLargePlayingCardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DNPortraitLargePlayingCardView.h; sourceTree = "<group>"; };
+		50AF1A961D97C95300D7C9BE /* DNPortraitLargePlayingCardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DNPortraitLargePlayingCardView.m; sourceTree = "<group>"; };
+		50AF1A981D97D1DC00D7C9BE /* DNLandScapeLargePlayingCardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DNLandScapeLargePlayingCardView.h; sourceTree = "<group>"; };
+		50AF1A991D97D1DC00D7C9BE /* DNLandScapeLargePlayingCardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DNLandScapeLargePlayingCardView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -381,6 +401,7 @@
 			isa = PBXGroup;
 			children = (
 				5045EBD61D964E52006FF2AD /* bg_face_circle@2x.png */,
+				50AF1A931D97C64300D7C9BE /* icon_glod@2x.png */,
 				5045EC051D9678C5006FF2AD /* card_backGround@2x.png */,
 				04F42E641D96E2A8005A483D /* show_arrow_down@2x.png */,
 				04F42E651D96E2A8005A483D /* show_arrow_left@2x.png */,
@@ -504,6 +525,10 @@
 				502A27371D912E3400473F23 /* DNDeck.m */,
 				502A27391D912F7500473F23 /* DNPlayingCardView.h */,
 				502A273A1D912F7500473F23 /* DNPlayingCardView.m */,
+				50AF1A951D97C95300D7C9BE /* DNPortraitLargePlayingCardView.h */,
+				50AF1A961D97C95300D7C9BE /* DNPortraitLargePlayingCardView.m */,
+				50AF1A981D97D1DC00D7C9BE /* DNLandScapeLargePlayingCardView.h */,
+				50AF1A991D97D1DC00D7C9BE /* DNLandScapeLargePlayingCardView.m */,
 			);
 			path = Card;
 			sourceTree = "<group>";
@@ -573,6 +598,7 @@
 		5098FC2C1D926720007AF211 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
+				50AF1A801D97A1FE00D7C9BE /* animation */,
 				5045EBA11D961D71006FF2AD /* others */,
 				5045EB881D961BE5006FF2AD /* menu */,
 				5045EB5F1D961AEA006FF2AD /* hu */,
@@ -580,6 +606,19 @@
 			);
 			name = Resource;
 			path = LCDouNiu/Resource;
+			sourceTree = "<group>";
+		};
+		50AF1A801D97A1FE00D7C9BE /* animation */ = {
+			isa = PBXGroup;
+			children = (
+				50AF1A811D97A1FE00D7C9BE /* icon_action_toast_chi@2x.png */,
+				50AF1A821D97A1FE00D7C9BE /* icon_action_toast_kan@2x.png */,
+				50AF1A831D97A1FE00D7C9BE /* icon_action_toast_pao@2x.png */,
+				50AF1A841D97A1FE00D7C9BE /* icon_action_toast_peng@2x.png */,
+				50AF1A851D97A1FE00D7C9BE /* icon_action_toast_sao@2x.png */,
+				50AF1A861D97A1FE00D7C9BE /* icon_action_toast_ti@2x.png */,
+			);
+			path = animation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -690,9 +729,11 @@
 				5045EBBE1D961D71006FF2AD /* message@2x.png in Resources */,
 				5045EBFE1D967762006FF2AD /* card_little_4@2x.png in Resources */,
 				5045EBD01D9631DA006FF2AD /* DNShowActivePlayerView.xib in Resources */,
+				50AF1A8A1D97A1FE00D7C9BE /* icon_action_toast_peng@2x.png in Resources */,
 				5045EBC01D961D71006FF2AD /* middle_click@2x.png in Resources */,
 				5085BF471D7455FB00ED5BC6 /* LaunchScreen.storyboard in Resources */,
 				5045EB7A1D961AEA006FF2AD /* hu_16@2x.png in Resources */,
+				50AF1A891D97A1FE00D7C9BE /* icon_action_toast_pao@2x.png in Resources */,
 				5085BF441D7455FB00ED5BC6 /* Assets.xcassets in Resources */,
 				5045EB7D1D961AEA006FF2AD /* hu_19@2x.png in Resources */,
 				5045EB991D961BE5006FF2AD /* guo_disable@2x.png in Resources */,
@@ -703,6 +744,8 @@
 				5045EC001D967762006FF2AD /* card_little_6@2x.png in Resources */,
 				5045EB9D1D961BE5006FF2AD /* hu_enable@2x.png in Resources */,
 				5045EBBC1D961D71006FF2AD /* left_click@2x.png in Resources */,
+				50AF1A8C1D97A1FE00D7C9BE /* icon_action_toast_ti@2x.png in Resources */,
+				50AF1A8B1D97A1FE00D7C9BE /* icon_action_toast_sao@2x.png in Resources */,
 				5045EB801D961AEA006FF2AD /* hu_2@2x.png in Resources */,
 				5045EBBB1D961D71006FF2AD /* leave@2x.png in Resources */,
 				5045EB7C1D961AEA006FF2AD /* hu_18@2x.png in Resources */,
@@ -727,6 +770,7 @@
 				5045EBF21D967762006FF2AD /* card_large_2@2x.png in Resources */,
 				5045EC031D967762006FF2AD /* card_little_9@2x.png in Resources */,
 				5045EBC11D961D71006FF2AD /* rectangle@2x.png in Resources */,
+				50AF1A871D97A1FE00D7C9BE /* icon_action_toast_chi@2x.png in Resources */,
 				5045EBF31D967762006FF2AD /* card_large_3@2x.png in Resources */,
 				5098FC201D9260A7007AF211 /* LICENSE in Resources */,
 				5045EB851D961AEA006FF2AD /* hu_7@2x.png in Resources */,
@@ -746,6 +790,7 @@
 				5045EBB81D961D71006FF2AD /* card_yellow_bg@2x.png in Resources */,
 				5045EBF11D967762006FF2AD /* card_large_1@2x.png in Resources */,
 				5045EBC41D961D71006FF2AD /* show_arrow@2x.png in Resources */,
+				50AF1A941D97C64300D7C9BE /* icon_glod@2x.png in Resources */,
 				5045EBBD1D961D71006FF2AD /* line@2x.png in Resources */,
 				5045EBC51D961D71006FF2AD /* voice@2x.png in Resources */,
 				5085BF421D7455FB00ED5BC6 /* Main.storyboard in Resources */,
@@ -766,6 +811,7 @@
 				5045EB751D961AEA006FF2AD /* hu_11@2x.png in Resources */,
 				5045EB9C1D961BE5006FF2AD /* hu_disable@2x.png in Resources */,
 				5045EB951D961BE5006FF2AD /* chi_click@2x.png in Resources */,
+				50AF1A881D97A1FE00D7C9BE /* icon_action_toast_kan@2x.png in Resources */,
 				5045EC041D967762006FF2AD /* card_little_10@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -800,6 +846,7 @@
 				502A273B1D912F7500473F23 /* DNPlayingCardView.m in Sources */,
 				502A27381D912E3400473F23 /* DNDeck.m in Sources */,
 				5085BF741D7461E600ED5BC6 /* DNCardGroup.m in Sources */,
+				50AF1A971D97C95400D7C9BE /* DNPortraitLargePlayingCardView.m in Sources */,
 				5098FC211D9260A7007AF211 /* MASCompositeConstraint.m in Sources */,
 				5098FC231D9260A7007AF211 /* MASConstraintMaker.m in Sources */,
 				5098FC291D9260A7007AF211 /* View+MASAdditions.m in Sources */,
@@ -809,6 +856,7 @@
 				5085BF3F1D7455FB00ED5BC6 /* ViewController.m in Sources */,
 				5085BF3C1D7455FB00ED5BC6 /* AppDelegate.m in Sources */,
 				5045EBD31D963E1D006FF2AD /* DNHeadView.m in Sources */,
+				50AF1A9A1D97D1DC00D7C9BE /* DNLandScapeLargePlayingCardView.m in Sources */,
 				5098FC271D9260A7007AF211 /* NSArray+MASAdditions.m in Sources */,
 				5098FC281D9260A7007AF211 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */,
 				5045EBCE1D9631CF006FF2AD /* DNShowActivePlayerView.m in Sources */,

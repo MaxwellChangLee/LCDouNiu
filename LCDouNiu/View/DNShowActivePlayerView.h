@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+typedef enum {
+    DNShowActivePlayerViewDirectionBottom,
+    DNShowActivePlayerViewDirectionLeft,
+    DNShowActivePlayerViewDirectionRight,
+    DNShowActivePlayerViewDirectionTop,
+}DNShowActivePlayerViewDirection;
+
 @interface DNShowActivePlayerView : UIView
 
 @property (weak, nonatomic) IBOutlet UIImageView *cardBoxImageView;
@@ -22,5 +29,10 @@
 @property (weak, nonatomic) IBOutlet UILabel *topScoreLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomScoreLabel;
 
+
+-(void)pointTo:(DNShowActivePlayerViewDirection)direction;
+
+-(void)showScoreResult:(NSDictionary *)resultDic;
+-(void)hideAllScore;
 
 @end
