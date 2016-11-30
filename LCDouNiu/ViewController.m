@@ -91,6 +91,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    return;
     self.player1Name = @"东哥";
     
     [self.view addSubview:self.player1HandContainer];
@@ -301,15 +302,15 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    self.player1HandContainer.backgroundColor = [UIColor clearColor];
-    [self makeMenuBgImage];
+//    self.player1HandContainer.backgroundColor = [UIColor clearColor];
+//    [self makeMenuBgImage];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self createCardViews];
-    [self dealCardViews];
-    [self performSelector:@selector(startTest_bottom) withObject:nil afterDelay:2];
+//    [self createCardViews];
+//    [self dealCardViews];
+//    [self performSelector:@selector(startTest_bottom) withObject:nil afterDelay:2];
 }
 
 - (void) createCardViews {
